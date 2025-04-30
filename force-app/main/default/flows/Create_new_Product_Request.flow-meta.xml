@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Assign_Address</name>
+        <label>Assign Address</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignmentItems>
+            <assignToReference>New_Product_Request.Status</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Draft</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_bew</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_ProductRequestNumber</name>
+        <label>Assign ProductRequestNumber</label>
+        <locationX>176</locationX>
+        <locationY>566</locationY>
+        <assignmentItems>
+            <assignToReference>Output_ProductRequestNumber</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>New_Product_Request.Id</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Create a new product request to deliver tools and equipment to service technicans. The input is a list of Product Request Line Items with Product2Id and QuantityRequested. Also a string with the delivery adress</description>
+    <environments>Default</environments>
+    <interviewLabel>Create new Product Request {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create new Product Request</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Create_bew</name>
+        <label>Create new Product Request</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <connector>
+            <targetReference>Assign_new_ProductRequestID_to_Line_Items</targetReference>
+        </connector>
+        <inputReference>New_Product_Request</inputReference>
+    </recordCreates>
+    <recordCreates>
+        <name>Create_Line_Items</name>
+        <label>Create Line Items</label>
+        <locationX>176</locationX>
+        <locationY>458</locationY>
+        <connector>
+            <targetReference>Assign_ProductRequestNumber</targetReference>
+        </connector>
+        <inputReference>Assign_new_ProductRequestID_to_Line_Items</inputReference>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Assign_Address</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <transforms>
+        <name>Assign_new_ProductRequestID_to_Line_Items</name>
+        <label>Assign new ProductRequestID to Line Items</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <connector>
+            <targetReference>Create_Line_Items</targetReference>
+        </connector>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <objectType>ProductRequestLineItem</objectType>
+        <scale>0</scale>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+        <transformValues>
+            <transformValueActions>
+                <outputFieldApiName>Product2Id</outputFieldApiName>
+                <transformType>Map</transformType>
+                <value>
+                    <elementReference>InputProducts[$EachItem].Product2Id</elementReference>
+                </value>
+            </transformValueActions>
+            <transformValueActions>
+                <outputFieldApiName>QuantityRequested</outputFieldApiName>
+                <transformType>Map</transformType>
+                <value>
+                    <elementReference>InputProducts[$EachItem].Quantity</elementReference>
+                </value>
+            </transformValueActions>
+            <transformValueActions>
+                <outputFieldApiName>ParentId</outputFieldApiName>
+                <transformType>Map</transformType>
+                <value>
+                    <elementReference>New_Product_Request.Id</elementReference>
+                </value>
+            </transformValueActions>
+        </transformValues>
+    </transforms>
+    <variables>
+        <description>The adress where the materials will be delivered</description>
+        <name>Input_Adress</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>A List of all Products that should be ordered. The format is: [{&apos;Product2Id&apos;: PRODUCT2ID, &apos;Quantity&apos;: QUANTITY}]
+The Product2Id is needed. If the quantity is unknow, set it to 1.</description>
+        <name>InputProducts</name>
+        <apexClass>FlowProductRequestInputClass</apexClass>
+        <dataType>Apex</dataType>
+        <isCollection>true</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>the new Product_Request to deliver tools and other equipment to the service technican</description>
+        <name>New_Product_Request</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>ProductRequest</objectType>
+    </variables>
+    <variables>
+        <name>Output_ProductRequestNumber</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>
